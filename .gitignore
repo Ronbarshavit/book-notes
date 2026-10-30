@@ -1,0 +1,17 @@
+# never commit audio (copyrighted, personal use only)
+*.mp3
+*.MP3
+*.m4a
+*.m4b
+*.aac
+*.wav
+*.ogg
+*.oga
+*.opus
+*.flac
+*.mp4
+*.webm
+*.caf
+*.aif*
+*.wma
+*.amr

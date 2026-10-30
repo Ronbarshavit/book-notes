@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self' blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Book Notes</title>
+  <meta name="description" content="Private audiobook player with timestamped notes. Your audio files never leave your device.">
+  <meta name="theme-color" content="#f4efe6" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1b211f" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Book Notes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="book-title">Healing the Fragmented Selves</div>
+      <div class="book-sub">Janina Fisher · listening notes</div>
+    </header>
+
+    <main>
+      <!-- LIBRARY -->
+      <section id="view-library" class="view" aria-labelledby="tab-library">
+        <div id="missing-banner" class="banner warn" hidden>
+          <strong>Some audio files are missing.</strong>
+          <span id="missing-text">Your notes are safe. Re-add the MP3 files to keep listening.</span>
+          <label class="btn btn-primary file-btn">Re-add files
+            <input type="file" class="file-input" accept="audio/mpeg,audio/mp3,audio/*,.mp3,.m4a,.m4b" multiple>
+          </label>
+        </div>
+
+        <div id="empty-state" class="empty" hidden>
+          <div class="empty-art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="72" height="72"><path d="M8 14c8-3 16-3 24 2v36c-8-5-16-5-24-2z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M56 14c-8-3-16-3-24 2v36c8-5 16-5 24-2z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
+          </div>
+          <h1>Add your audiobook</h1>
+          <div id="install-steps" class="install-steps" hidden>
+            <strong>On iPhone, install first</strong>
+            <ol>
+              <li>Tap <b>Share</b> → <b>Add to Home Screen</b>.</li>
+              <li>Open <b>Book Notes</b> from the new icon. The Home Screen app keeps its own storage, so files added here in Safari won't appear there.</li>
+              <li>Then tap <b>Choose MP3 files</b> in the app.</li>
+            </ol>
+          </div>
+          <p>Choose the MP3 chapters you saved from Telegram (in the Files app). They're stored <strong>only on this device</strong> and never uploaded.</p>
+          <label class="btn btn-primary btn-xl file-btn">Choose MP3 files
+            <input type="file" class="file-input" accept="audio/mpeg,audio/mp3,audio/*,.mp3,.m4a,.m4b" multiple>
+          </label>
+          <p class="hint" id="picker-hint">In Files, tap <b>Select</b> (top right), then <b>Select All</b>, or tap each chapter, then <b>Open</b>. You can add more later.</p>
+          <label class="btn btn-quiet file-btn restore-empty">Restore notes from a backup
+            <input type="file" class="restore-input" accept="application/json,.json">
+          </label>
+        </div>
+
+        <div id="library-list-wrap" hidden>
+          <div class="section-head">
+            <h2>Chapters</h2>
+            <label class="btn btn-quiet file-btn">Add files
+              <input type="file" class="file-input" accept="audio/mpeg,audio/mp3,audio/*,.mp3,.m4a,.m4b" multiple>
+            </label>
+          </div>
+          <ol id="track-list" class="track-list"></ol>
+          <div class="text-size" role="group" aria-label="Text size">
+            <span class="lbl">Text size</span>
+            <button type="button" class="btn-round small" id="btn-text-smaller" aria-label="Smaller text">A−</button>
+            <output id="text-size-val">100%</output>
+            <button type="button" class="btn-round small" id="btn-text-larger" aria-label="Larger text">A+</button>
+          </div>
+          <details class="manage">
+            <summary>Storage</summary>
+            <p id="storage-info" class="hint">Checking storage…</p>
+            <button id="btn-remove-audio" class="btn btn-danger-quiet" type="button">Remove audio from this device</button>
+            <p class="hint">Notes are kept. You can re-add the files anytime.</p>
+          </details>
+          <section class="backup" aria-labelledby="backup-h">
+            <h2 id="backup-h">Backup</h2>
+            <p class="hint">One file with your notes, voice notes, listening positions and settings (not the MP3s). Keep it in Files or iCloud Drive.</p>
+            <p id="backup-info" class="hint"></p>
+            <div class="export-row">
+              <button class="btn btn-quiet" id="btn-backup" type="button">Back up now</button>
+              <label class="btn btn-quiet file-btn">Restore backup
+                <input type="file" class="restore-input" accept="application/json,.json">
+              </label>
+            </div>
+          </section>
+        </div>
+        <div id="import-progress" class="banner import-progress" hidden role="status">
+          <div id="import-line" class="import-line">Preparing…</div>
+          <progress id="import-bar" max="1" value="0"></progress>
+          <div id="import-sub" class="import-sub">Keep this screen open until it finishes.</div>
+        </div>
+      </section>
+
+      <!-- PLAYER -->
+      <section id="view-player" class="view" hidden aria-labelledby="tab-player">
+        <div id="player-empty" class="empty small" hidden>
+          <p>Pick a chapter in the Library to start listening.</p>
+        </div>
+        <div id="player-ui" class="player-ui">
+          <div class="now">
+            <div id="now-index" class="now-index">—</div>
+            <h1 id="now-title" class="now-title">No chapter loaded</h1>
+            <div id="now-missing" class="banner warn small" hidden>This chapter's file is missing. Re-add it in the Library.</div>
+          </div>
+
+          <div class="scrub">
+            <input id="scrubber" type="range" min="0" max="0" step="1" value="0" aria-label="Position">
+            <div class="times"><span id="t-cur">00:00</span><span id="t-left">-00:00</span></div>
+          </div>
+
+          <div class="track-nav">
+            <button class="btn btn-quiet" id="btn-prev" type="button" aria-label="Previous chapter">‹ Prev</button>
+            <button class="btn btn-quiet btn-speed" id="btn-speed" type="button" aria-haspopup="dialog" aria-label="Playback speed"><span id="speed-btn-val">1.00×</span></button>
+            <button class="btn btn-quiet" id="btn-next" type="button" aria-label="Next chapter">Next ›</button>
+          </div>
+
+          <div id="interrupt-hint" class="banner warn small interrupt" hidden role="status">Paused by a call or another app. Tap ▶ to continue.</div>
+          <div class="player-spacer"></div>
+
+          <div class="transport">
+            <button class="btn-round" id="btn-back30" type="button" aria-label="Back 30 seconds"><span class="skip">−30</span></button>
+            <button class="btn-round" id="btn-back15" type="button" aria-label="Back 15 seconds"><span class="skip">−15</span></button>
+            <button class="btn-play" id="btn-play" type="button" aria-label="Play">
+              <svg id="ico-play" viewBox="0 0 24 24" width="38" height="38"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+              <svg id="ico-pause" viewBox="0 0 24 24" width="38" height="38" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+            </button>
+            <button class="btn-round" id="btn-fwd15" type="button" aria-label="Forward 15 seconds"><span class="skip">+15</span></button>
+            <button class="btn-round" id="btn-fwd30" type="button" aria-label="Forward 30 seconds"><span class="skip">+30</span></button>
+          </div>
+        </div>
+        <div class="note-dock" id="note-dock">
+          <button id="btn-note" class="btn-note" type="button">
+            <span class="note-plus" aria-hidden="true">＋</span>
+            <span>Note <span id="note-at" class="note-at">at 00:00</span></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- NOTES -->
+      <section id="view-notes" class="view" hidden aria-labelledby="tab-notes">
+        <div class="section-head">
+          <h2>Notes <span id="notes-count" class="count"></span></h2>
+        </div>
+        <div class="export-row">
+          <button class="btn btn-quiet" id="btn-export-md" type="button">Export Markdown</button>
+          <button class="btn btn-quiet" id="btn-export-json" type="button">Export JSON</button>
+        </div>
+        <pre id="export-preview" class="export-preview" hidden></pre>
+        <div id="notes-empty" class="empty small" hidden>
+          <p>No notes yet. While listening, tap <strong>＋ Note</strong> to capture a thought at that exact moment.</p>
+        </div>
+        <div id="notes-list"></div>
+      </section>
+    </main>
+
+    <nav class="tabbar" role="tablist">
+      <button role="tab" id="tab-library" data-view="library" type="button"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 5h4v14H4zM10 5h4v14h-4zM16.5 5.5l3.4-.9 3.1 13.5-3.4.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Library</span></button>
+      <button role="tab" id="tab-player" data-view="player" type="button"><svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/></svg><span>Player</span></button>
+      <button role="tab" id="tab-notes" data-view="notes" type="button"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M6 3h9l4 4v14H6z M9 11h7M9 15h7M9 7h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Notes</span></button>
+    </nav>
+  </div>
+
+  <!-- NOTE SHEET -->
+  <div id="note-sheet" class="sheet-backdrop" hidden>
+    <div class="sheet" id="note-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="sheet-bar">
+        <button type="button" class="btn btn-quiet" id="btn-note-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-note-save">Save &amp; resume</button>
+      </div>
+      <div class="sheet-head">
+        <div>
+          <div id="sheet-title" class="sheet-title">New note</div>
+          <div id="sheet-stamp" class="sheet-stamp"></div>
+        </div>
+        <div class="nudge">
+          <button type="button" class="btn-round small" id="nudge-minus" aria-label="5 seconds earlier">−5</button>
+          <button type="button" class="btn-round small" id="nudge-plus" aria-label="5 seconds later">+5</button>
+        </div>
+      </div>
+      <textarea id="note-text" rows="4" placeholder="What came up for you here?" aria-label="Note text"></textarea>
+      <div id="voice-box" class="voice-box">
+        <button type="button" class="btn btn-quiet" id="btn-rec"><span class="rec-dot" aria-hidden="true"></span><span id="rec-label">Record voice note</span></button>
+        <span id="rec-time" class="rec-time" hidden>0:00</span>
+        <div id="voice-preview" class="voice-preview" hidden>
+          <audio id="voice-audio" controls preload="metadata"></audio>
+          <button type="button" class="btn btn-danger-quiet" id="btn-voice-remove">Remove</button>
+        </div>
+        <p id="voice-unsupported" class="hint" hidden>Voice notes aren't available in this browser.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEED SHEET -->
+  <div id="speed-sheet" class="sheet-backdrop" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Playback speed">
+      <div class="sheet-bar">
+        <div class="sheet-title">Speed</div>
+        <button type="button" class="btn btn-quiet" id="btn-speed-done">Done</button>
+      </div>
+      <div class="speed" role="group" aria-label="Fine speed">
+        <button class="btn-round small" id="btn-slower" type="button" aria-label="Slower">−</button>
+        <output id="speed-val" class="speed-val">1.00×</output>
+        <button class="btn-round small" id="btn-faster" type="button" aria-label="Faster">+</button>
+      </div>
+      <div class="speed-presets" id="speed-presets">
+        <button type="button" data-speed="0.8">0.8×</button><button type="button" data-speed="1">1×</button><button type="button" data-speed="1.25">1.25×</button><button type="button" data-speed="1.5">1.5×</button><button type="button" data-speed="1.75">1.75×</button><button type="button" data-speed="2">2×</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden><span id="toast-msg"></span><button type="button" id="toast-action" class="toast-action" hidden></button></div>
+  <audio id="audio" preload="metadata" playsinline></audio>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
