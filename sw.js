@@ -2,7 +2,7 @@
 // never fetched over the network, so it is never cached or requested here.
 // VERSION is stamped by build_deploy.sh with a hash of the shipped files, so every
 // deploy installs a fresh, complete, atomic snapshot of the shell.
-const VERSION = 'abn-shell-85fcc7292b1c';
+const VERSION = 'abn-shell-faaedd2257c9';
 const SHELL = [
   './', './index.html', './styles.css', './app.js', './storage.js', './id3.js', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png',

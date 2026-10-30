@@ -21,179 +21,200 @@
 <body>
   <div id="app">
     <header class="topbar">
-      <div class="book-title">Healing the Fragmented Selves</div>
-      <div class="book-sub">Janina Fisher · listening notes</div>
+      <div class="book-title" id="book-title">Healing the Fragmented Selves of Trauma Survivors</div>
+      <button type="button" class="btn-more" id="btn-more" aria-label="More: speed, text size, backup, books">⋯</button>
     </header>
 
     <main>
-      <!-- LIBRARY -->
-      <section id="view-library" class="view" aria-labelledby="tab-library">
-        <div id="missing-banner" class="banner warn" hidden>
-          <strong>Some audio files are missing.</strong>
-          <span id="missing-text">Your notes are safe. Re-add the MP3 files to keep listening.</span>
-          <label class="btn btn-primary file-btn">Re-add files
-            <input type="file" class="file-input" accept="audio/mpeg,audio/mp3,audio/*,.mp3,.m4a,.m4b" multiple>
-          </label>
-        </div>
-
-        <div id="empty-state" class="empty" hidden>
-          <div class="empty-art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" width="72" height="72"><path d="M8 14c8-3 16-3 24 2v36c-8-5-16-5-24-2z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M56 14c-8-3-16-3-24 2v36c8-5 16-5 24-2z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
-          </div>
-          <h1>Add your audiobook</h1>
-          <div id="install-steps" class="install-steps" hidden>
-            <strong>On iPhone, install first</strong>
-            <ol>
-              <li>Tap <b>Share</b> → <b>Add to Home Screen</b>.</li>
-              <li>Open <b>Book Notes</b> from the new icon. The Home Screen app keeps its own storage, so files added here in Safari won't appear there.</li>
-              <li>Then tap <b>Choose MP3 files</b> in the app.</li>
-            </ol>
-          </div>
-          <p>Choose the MP3 chapters you saved from Telegram (in the Files app). They're stored <strong>only on this device</strong> and never uploaded.</p>
-          <label class="btn btn-primary btn-xl file-btn">Choose MP3 files
-            <input type="file" class="file-input" accept="audio/mpeg,audio/mp3,audio/*,.mp3,.m4a,.m4b" multiple>
-          </label>
-          <p class="hint" id="picker-hint">In Files, tap <b>Select</b> (top right), then <b>Select All</b>, or tap each chapter, then <b>Open</b>. You can add more later.</p>
-          <label class="btn btn-quiet file-btn restore-empty">Restore notes from a backup
-            <input type="file" class="restore-input" accept="application/json,.json">
-          </label>
-        </div>
-
-        <div id="library-list-wrap" hidden>
-          <div class="section-head">
-            <h2>Chapters</h2>
-            <label class="btn btn-quiet file-btn">Add files
-              <input type="file" class="file-input" accept="audio/mpeg,audio/mp3,audio/*,.mp3,.m4a,.m4b" multiple>
-            </label>
-          </div>
-          <ol id="track-list" class="track-list"></ol>
-          <div class="text-size" role="group" aria-label="Text size">
-            <span class="lbl">Text size</span>
-            <button type="button" class="btn-round small" id="btn-text-smaller" aria-label="Smaller text">A−</button>
-            <output id="text-size-val">100%</output>
-            <button type="button" class="btn-round small" id="btn-text-larger" aria-label="Larger text">A+</button>
-          </div>
-          <details class="manage">
-            <summary>Storage</summary>
-            <p id="storage-info" class="hint">Checking storage…</p>
-            <button id="btn-remove-audio" class="btn btn-danger-quiet" type="button">Remove audio from this device</button>
-            <p class="hint">Notes are kept. You can re-add the files anytime.</p>
-          </details>
-          <section class="backup" aria-labelledby="backup-h">
-            <h2 id="backup-h">Backup</h2>
-            <p class="hint">One file with your notes, voice notes, listening positions and settings (not the MP3s). Keep it in Files or iCloud Drive.</p>
-            <p id="backup-info" class="hint"></p>
-            <div class="export-row">
-              <button class="btn btn-quiet" id="btn-backup" type="button">Back up now</button>
-              <label class="btn btn-quiet file-btn">Restore backup
-                <input type="file" class="restore-input" accept="application/json,.json">
-              </label>
-            </div>
-          </section>
-        </div>
-        <div id="import-progress" class="banner import-progress" hidden role="status">
-          <div id="import-line" class="import-line">Preparing…</div>
+      <div id="import-progress" class="card import-progress" role="status" aria-live="polite" hidden>
+          <div id="import-line" class="import-line">Getting the book…</div>
           <progress id="import-bar" max="1" value="0"></progress>
-          <div id="import-sub" class="import-sub">Keep this screen open until it finishes.</div>
+          <div id="import-sub" class="import-sub">Keep Book Notes open.</div>
+          <button type="button" class="btn btn-primary" id="btn-start-first" hidden>▶ Start chapter 1</button>
+        </div>
+      <!-- FIRST RUN (staged): install card in a Safari tab, then Get the book, then loading -->
+      <section id="first-run" class="first-run" hidden>
+        <div class="fr-art" aria-hidden="true">📖</div>
+        <h1 id="fr-title">Healing the Fragmented Selves of Trauma Survivors</h1>
+        <p class="fr-lead">Listen and drop notes at the exact second.</p>
+
+        <div id="install-card" class="card step-card" hidden>
+          <strong>Step 1 of 2 · Add to Home Screen</strong>
+          <p>Tap <b>Share ⬆</b> below, then <b>Add to Home Screen</b>, then open Book Notes from the icon. Your book is kept there.</p>
+        </div>
+
+
+        <div class="fr-actions" id="fr-actions">
+          <button type="button" class="btn btn-primary btn-xl" id="btn-get-book">Get the book</button>
+          <p class="hint" id="fr-get-hint" hidden>Opens after Step 1 · <button type="button" class="link" id="btn-continue-safari">Continue in Safari anyway</button></p>
+          <label class="link file-btn" id="fr-backup">I have a backup file<input type="file" class="restore-input" accept=".json,application/json"></label>
         </div>
       </section>
 
-      <!-- PLAYER -->
-      <section id="view-player" class="view" hidden aria-labelledby="tab-player">
-        <div id="player-empty" class="empty small" hidden>
-          <p>Pick a chapter in the Library to start listening.</p>
+      <!-- LISTEN (the one screen) -->
+      <section id="listen" class="listen" hidden>
+        <div id="missing-banner" class="banner warn" hidden>
+          <span id="missing-text"></span>
+          <label class="btn btn-primary file-btn">Add the missing files<input type="file" class="file-input" accept="audio/*,.mp3,.m4a,.m4b" multiple></label>
         </div>
-        <div id="player-ui" class="player-ui">
-          <div class="now">
-            <div id="now-index" class="now-index">—</div>
-            <h1 id="now-title" class="now-title">No chapter loaded</h1>
-            <div id="now-missing" class="banner warn small" hidden>This chapter's file is missing. Re-add it in the Library.</div>
-          </div>
-
-          <div class="scrub">
-            <input id="scrubber" type="range" min="0" max="0" step="1" value="0" aria-label="Position">
-            <div class="times"><span id="t-cur">00:00</span><span id="t-left">-00:00</span></div>
-          </div>
-
-          <div class="track-nav">
-            <button class="btn btn-quiet" id="btn-prev" type="button" aria-label="Previous chapter">‹ Prev</button>
-            <button class="btn btn-quiet btn-speed" id="btn-speed" type="button" aria-haspopup="dialog" aria-label="Playback speed"><span id="speed-btn-val">1.00×</span></button>
-            <button class="btn btn-quiet" id="btn-next" type="button" aria-label="Next chapter">Next ›</button>
-          </div>
-
-          <div id="interrupt-hint" class="banner warn small interrupt" hidden role="status">Paused by a call or another app. Tap ▶ to continue.</div>
-          <div class="player-spacer"></div>
-
-          <div class="transport">
-            <button class="btn-round" id="btn-back30" type="button" aria-label="Back 30 seconds"><span class="skip">−30</span></button>
-            <button class="btn-round" id="btn-back15" type="button" aria-label="Back 15 seconds"><span class="skip">−15</span></button>
-            <button class="btn-play" id="btn-play" type="button" aria-label="Play">
-              <svg id="ico-play" viewBox="0 0 24 24" width="38" height="38"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
-              <svg id="ico-pause" viewBox="0 0 24 24" width="38" height="38" hidden><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
-            </button>
-            <button class="btn-round" id="btn-fwd15" type="button" aria-label="Forward 15 seconds"><span class="skip">+15</span></button>
-            <button class="btn-round" id="btn-fwd30" type="button" aria-label="Forward 30 seconds"><span class="skip">+30</span></button>
-          </div>
+        <button type="button" class="banner small finish" id="btn-finish" hidden>Finish getting the book (<span id="finish-count">0 of 20</span>) ›</button>
+        <button type="button" class="title-card" id="btn-chapters" aria-haspopup="dialog">
+          <span class="tc-index" id="now-index">Chapter 1 of 20 ▾</span>
+          <span class="tc-title" id="now-title">—</span>
+        </button>
+        <div class="scrub">
+          <input type="range" id="scrubber" min="0" max="0" value="0" step="1" aria-label="Position in chapter">
+          <div class="times"><span id="t-cur">00:00</span><span class="times-right"><button type="button" class="speed-pill" id="speed-pill" hidden><span id="speed-btn-val">1.00×</span></button><span id="t-left">-00:00</span></span></div>
         </div>
-        <div class="note-dock" id="note-dock">
-          <button id="btn-note" class="btn-note" type="button">
-            <span class="note-plus" aria-hidden="true">＋</span>
-            <span>Note <span id="note-at" class="note-at">at 00:00</span></span>
+        <button type="button" class="notes-chip" id="btn-notes" aria-haspopup="dialog"><span aria-hidden="true">📝</span> <span id="chip-text">No notes in this chapter yet</span> <span aria-hidden="true" class="chev">›</span></button>
+        <p id="interrupt-hint" class="banner small interrupt" hidden>Playback was paused by another app or a call. Tap ▶ to continue.</p>
+        <div id="backup-nudge" class="banner small" hidden><span id="backup-nudge-text">You have 10 notes. A backup file keeps them safe.</span> <span class="nudge-actions"><button type="button" class="btn btn-quiet" id="btn-backup-nudge">Back up notes</button><button type="button" class="link" id="btn-backup-later">Later</button></span></div>
+        <div class="player-spacer"></div>
+        <div class="transport" role="group" aria-label="Playback">
+          <button type="button" class="btn-round skip" id="btn-back15" aria-label="Back 15 seconds">↺15</button>
+          <button type="button" class="btn-play" id="btn-play" aria-label="Play">
+            <svg id="ico-play" width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+            <svg id="ico-pause" width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" hidden><path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
           </button>
+          <button type="button" class="btn-round skip" id="btn-fwd15" aria-label="Forward 15 seconds">15↻</button>
         </div>
-      </section>
-
-      <!-- NOTES -->
-      <section id="view-notes" class="view" hidden aria-labelledby="tab-notes">
-        <div class="section-head">
-          <h2>Notes <span id="notes-count" class="count"></span></h2>
-        </div>
-        <div class="export-row">
-          <button class="btn btn-quiet" id="btn-export-md" type="button">Export Markdown</button>
-          <button class="btn btn-quiet" id="btn-export-json" type="button">Export JSON</button>
-        </div>
-        <pre id="export-preview" class="export-preview" hidden></pre>
-        <div id="notes-empty" class="empty small" hidden>
-          <p>No notes yet. While listening, tap <strong>＋ Note</strong> to capture a thought at that exact moment.</p>
-        </div>
-        <div id="notes-list"></div>
+        <p id="first-tip" class="tip" hidden>Tap ＋ Note or 🎙 any time. The book pauses. <button type="button" class="link" id="btn-tip-ok">Got it</button></p>
       </section>
     </main>
 
-    <nav class="tabbar" role="tablist">
-      <button role="tab" id="tab-library" data-view="library" type="button"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 5h4v14H4zM10 5h4v14h-4zM16.5 5.5l3.4-.9 3.1 13.5-3.4.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Library</span></button>
-      <button role="tab" id="tab-player" data-view="player" type="button"><svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/></svg><span>Player</span></button>
-      <button role="tab" id="tab-notes" data-view="notes" type="button"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M6 3h9l4 4v14H6z M9 11h7M9 15h7M9 7h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Notes</span></button>
-    </nav>
+    <!-- capture dock: bottom of the screen is capture only -->
+    <div class="dock" id="dock" hidden>
+      <button type="button" class="btn-note" id="btn-note"><span class="note-plus" aria-hidden="true">＋</span><span>Note</span><span class="note-at" id="note-at">at 00:00</span></button>
+      <button type="button" class="btn-speak" id="btn-speak" aria-label="Speak a voice note"><span aria-hidden="true" class="mic">🎙</span><span>Speak</span></button>
+    </div>
   </div>
 
-  <!-- NOTE SHEET -->
+  <!-- CHAPTERS SHEET (from the title card) -->
+  <div id="chapters-sheet" class="sheet-backdrop" hidden>
+    <div class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="chapters-title">
+      <div class="sheet-bar sticky"><div class="sheet-title" id="chapters-title">Chapters</div><button type="button" class="btn btn-quiet" data-close>Done</button></div>
+      <ul class="track-list" id="track-list"></ul>
+      <button type="button" class="btn btn-quiet" id="btn-chapters-add">Add or replace chapters</button>
+    </div>
+  </div>
+
+  <!-- NOTES SHEET (from the notes chip) -->
+  <div id="notes-sheet" class="sheet-backdrop" hidden>
+    <div class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="notes-title">
+      <div class="sheet-bar sticky"><div class="sheet-title" id="notes-title">Notes</div><button type="button" class="btn btn-quiet" data-close>Done</button></div>
+      <div class="segment" role="tablist" aria-label="Which notes">
+        <button type="button" role="tab" id="seg-chapter" aria-selected="true">This chapter</button>
+        <button type="button" role="tab" id="seg-all" aria-selected="false">All chapters</button>
+      </div>
+      <div id="notes-list" class="notes-list"></div>
+      <p id="notes-empty" class="empty small" hidden>No notes here yet. Tap ＋ Note or 🎙 while you listen.</p>
+      <p class="hint center" id="notes-help">Tap the time to listen from 3 s before. Tap the text to edit.</p>
+      <button type="button" class="btn btn-quiet btn-wide" id="btn-export-md">Share notes…</button>
+    </div>
+  </div>
+
+  <!-- NOTE SHEET: new / edit / voice -->
   <div id="note-sheet" class="sheet-backdrop" hidden>
     <div class="sheet" id="note-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
       <div class="sheet-bar">
         <button type="button" class="btn btn-quiet" id="btn-note-cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" id="btn-note-save">Save &amp; resume</button>
+        <div class="sheet-title" id="sheet-title">New note</div>
+        <button type="button" class="btn btn-primary" id="btn-note-save">Save &amp; resume ▶</button>
       </div>
       <div class="sheet-head">
-        <div>
-          <div id="sheet-title" class="sheet-title">New note</div>
-          <div id="sheet-stamp" class="sheet-stamp"></div>
-        </div>
-        <div class="nudge">
-          <button type="button" class="btn-round small" id="nudge-minus" aria-label="5 seconds earlier">−5</button>
-          <button type="button" class="btn-round small" id="nudge-plus" aria-label="5 seconds later">+5</button>
-        </div>
+        <div class="sheet-stamp" id="sheet-stamp"></div>
+        <div class="nudge"><button type="button" class="btn-round small" id="nudge-minus" aria-label="5 seconds earlier">−5 s</button><button type="button" class="btn-round small" id="nudge-plus" aria-label="5 seconds later">+5 s</button></div>
       </div>
-      <textarea id="note-text" rows="4" placeholder="What came up for you here?" aria-label="Note text"></textarea>
-      <div id="voice-box" class="voice-box">
-        <button type="button" class="btn btn-quiet" id="btn-rec"><span class="rec-dot" aria-hidden="true"></span><span id="rec-label">Record voice note</span></button>
-        <span id="rec-time" class="rec-time" hidden>0:00</span>
-        <div id="voice-preview" class="voice-preview" hidden>
+      <div id="rec-panel" class="rec-panel" hidden>
+        <div class="rec-big"><span class="rec-dot" aria-hidden="true"></span> Recording <span id="rec-time" class="rec-time">0:00</span></div>
+        <div class="meter" aria-hidden="true"><i id="rec-level"></i></div>
+        <button type="button" class="btn btn-rec-done" id="btn-voice-done">■ Done · save &amp; resume</button>
+      </div>
+      <textarea id="note-text" placeholder="What's on your mind?" aria-label="Note text"></textarea>
+      <div class="voice-box">
+        <button type="button" class="btn btn-quiet" id="btn-rec"><span class="rec-dot" aria-hidden="true"></span><span id="rec-label">🎙 Speak instead</span></button>
+        <div class="voice-preview" id="voice-preview" hidden>
           <audio id="voice-audio" controls preload="metadata"></audio>
           <button type="button" class="btn btn-danger-quiet" id="btn-voice-remove">Remove</button>
         </div>
         <p id="voice-unsupported" class="hint" hidden>Voice notes aren't available in this browser.</p>
       </div>
+      <button type="button" class="btn btn-danger-quiet" id="btn-note-delete" hidden>Delete note</button>
+    </div>
+  </div>
+
+  <!-- MORE SHEET -->
+  <div id="more-sheet" class="sheet-backdrop" hidden>
+    <div class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="more-title">
+      <div class="sheet-bar sticky"><div class="sheet-title" id="more-title">More</div><button type="button" class="btn btn-quiet" data-close>Done</button></div>
+      <div class="rows">
+        <button type="button" class="row" id="row-book"><span class="row-l">Book</span><span class="row-r" id="row-book-val">—</span></button>
+        <button type="button" class="row" id="row-bot"><span class="row-l">Telegram bot</span><span class="row-r" id="row-bot-val">—</span></button>
+        <button type="button" class="row" id="btn-speed"><span class="row-l">Speed</span><span class="row-r"><span id="speed-row-val">1.00×</span> ›</span></button>
+        <div class="row static"><span class="row-l">Text size</span><span class="row-r text-size">
+          <button class="btn-round small" id="btn-text-smaller" type="button" aria-label="Smaller text">A−</button>
+          <output id="text-size-val">100%</output>
+          <button class="btn-round small" id="btn-text-larger" type="button" aria-label="Larger text">A+</button></span></div>
+        <button type="button" class="row" id="row-share"><span class="row-l">Share notes</span><span class="row-r">Markdown ›</span></button>
+        <button type="button" class="row" id="btn-backup"><span class="row-l">Back up notes</span><span class="row-r" id="backup-info">Last: never ›</span></button>
+        <label class="row file-btn"><span class="row-l">Load a backup file</span><span class="row-r">›</span><input type="file" class="restore-input" accept=".json,application/json"></label>
+        <button type="button" class="row" id="row-chapters-add"><span class="row-l">Add or replace chapters</span><span class="row-r">Telegram / Files ›</span></button>
+        <button type="button" class="row" id="btn-remove-audio"><span class="row-l">Free up space</span><span class="row-r">Removes audio, keeps notes ›</span></button>
+        <button type="button" class="row" id="btn-export-json"><span class="row-l">Share notes as data (JSON)</span><span class="row-r">›</span></button>
+        <div class="row static col"><span class="row-l">Storage</span><span class="hint" id="storage-info"></span></div>
+      </div>
+      <pre id="export-preview" class="export-preview" hidden></pre>
+    </div>
+  </div>
+
+  <!-- SOURCE SHEET: Get the book (guided Telegram -> Files, or Files, or backup) -->
+  <div id="source-sheet" class="sheet-backdrop" hidden>
+    <div class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="source-title">
+      <div class="sheet-bar sticky"><div class="sheet-title" id="source-title">Get the book</div><button type="button" class="btn btn-quiet" data-close>Close</button></div>
+      <p class="hint" id="source-sub">20 chapters · about 372 MB · stays on this iPhone</p>
+      <div class="card src-card" id="src-telegram">
+        <strong>From Telegram <span id="src-bot-name" class="muted"></span></strong>
+        <ol class="steps">
+          <li><a class="btn btn-primary" id="btn-open-telegram" href="https://t.me/Healingthefragbot" target="_blank" rel="noopener noreferrer">Open in Telegram</a>
+            <span class="hint">The bot's chat has the chapters as MP3 files.</span></li>
+          <li>In the chat, tap each file → <b>⋯</b> or <b>Share</b> → <b>Save to Files</b>, and put them all in one folder (e.g. “Book Notes”).</li>
+          <li>Come back here and choose them:
+            <label class="btn btn-primary file-btn" id="btn-pick-tg">Choose the MP3s<input type="file" class="file-input" accept="audio/*,.mp3,.m4a,.m4b" multiple></label>
+            <span class="hint">In Files: open the folder → <b>Select</b> → <b>Select All</b> → <b>Open</b>.</span></li>
+        </ol>
+        <p class="hint" id="src-no-bot" hidden>No Telegram bot set for this book. <button type="button" class="link" id="btn-src-set-bot">Add one</button></p>
+      </div>
+      <div class="card src-card">
+        <strong>From Files on this iPhone</strong>
+        <label class="btn btn-quiet file-btn" id="btn-pick-files">Choose MP3 files<input type="file" class="file-input" accept="audio/*,.mp3,.m4a,.m4b" multiple></label>
+        <span class="hint" id="picker-hint">Tap Select → Select All → Open. Choose all chapters at once.</span>
+      </div>
+      <label class="link file-btn center">I have a backup file<input type="file" class="restore-input" accept=".json,application/json"></label>
+    </div>
+  </div>
+
+  <!-- BOOKS SHEET: switch / add / edit -->
+  <div id="books-sheet" class="sheet-backdrop" hidden>
+    <div class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="books-title">
+      <div class="sheet-bar sticky"><div class="sheet-title" id="books-title">Books</div><button type="button" class="btn btn-quiet" data-close>Done</button></div>
+      <ul class="book-list" id="book-list"></ul>
+      <button type="button" class="btn btn-quiet" id="btn-edit-book">Rename this book or change its bot</button>
+      <button type="button" class="btn btn-primary" id="btn-add-book">＋ Add a book</button>
+    </div>
+  </div>
+
+  <!-- BOOK EDITOR: title + Telegram bot username (no tokens, ever) -->
+  <div id="book-sheet" class="sheet-backdrop" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="book-sheet-title">
+      <div class="sheet-bar">
+        <button type="button" class="btn btn-quiet" id="btn-book-cancel">Cancel</button>
+        <div class="sheet-title" id="book-sheet-title">Book</div>
+        <button type="button" class="btn btn-primary" id="btn-book-save">Save</button>
+      </div>
+      <label class="field"><span>Title</span><input type="text" id="book-title-input" maxlength="200" autocomplete="off" placeholder="Book title"></label>
+      <label class="field"><span>Telegram bot (optional)</span><input type="text" id="bot-input" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. Healingthefragbot or t.me/…"></label>
+      <p class="hint" id="bot-msg">The bot that sends you this book's MP3s. Only its public username is stored.</p>
+      <a class="link" id="bot-preview" href="https://t.me/Healingthefragbot" target="_blank" rel="noopener noreferrer" hidden>t.me/Healingthefragbot</a>
     </div>
   </div>
 
